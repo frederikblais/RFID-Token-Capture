@@ -12,4 +12,5 @@ classroom capacity is 20 students for all the classrooms.
 
 The terminal management application saves the data in a text file 
 according to the following format:
-idrfid; date; intime; outtime
+
+> idrfid; date; intime; outtime
