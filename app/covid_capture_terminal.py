@@ -3,6 +3,7 @@ import os
 import os.path
 import datetime
 import time
+import random
 
 # Clear the screen.
 os.system('clear')
@@ -18,6 +19,12 @@ print (line)
 # Set data directory
 os.chdir("app")
 os.chdir(".data")
+
+def random_time():
+    hours = random.randint(1,24)
+    minutes = random.randint(1,59)
+    rand_time = (str(hours)+':'+str(minutes))
+    return rand_time
 
 # Create 5 txt files for the day
 def create_file():
@@ -35,12 +42,13 @@ def create_file():
         student_file = open("students.txt","r")
         for _ in range(1,20+1):
             date = datetime.date.today()
+            
+            rand_time = str(random_time())
 
             rfid_data = student_file.readline()
-            formated_data = str(rfid_data)+str(date)+os.linesep
-            fd = str.join(";", formated_data.splitlines())
-            toFile = fd
-            txt_file.writelines(toFile)
+            raw_data = [rfid_data,str(date),str(rand_time)]
+            formated_data = [x[:-1] for x in raw_data]
+            txt_file.write(str(formated_data)+'\n')
 
         txt_file.close()
 
@@ -48,10 +56,18 @@ def create_file():
         print(resp)
         file_count += 1
 
-# Delete all the files in .data
+# Delete all the files in .data exept student.txt
 def delete_file():
-    resp = "Data file deleted"
-    print(resp)
+    try:
+        os.remove('classroom1.txt')
+        os.remove('classroom2.txt')
+        os.remove('classroom3.txt')
+        os.remove('classroom4.txt')
+        os.remove('classroom5.txt')
+        resp = "Data file deleted"
+        print(resp)
+    except:
+        print("Files not found.")
 
 # Input Loop, break if "x" is selected
 while True:
