@@ -1,9 +1,12 @@
 # randomly generate one data file per classroom, you must generate 5 classrooms for one day.
 import os
 import os.path
-import datetime
+import radar
 import time
 import random
+
+import datetime as dt
+from datetime import timedelta
 
 # Clear the screen.
 os.system('clear')
@@ -20,12 +23,6 @@ print (line)
 os.chdir("app")
 os.chdir(".data")
 
-def random_time():
-    hours = random.randint(1,24)
-    minutes = random.randint(1,59)
-    rand_time = (str(hours)+':'+str(minutes))
-    return rand_time
-
 # Create 5 txt files for the day
 def create_file():
     file_count = 0
@@ -41,12 +38,17 @@ def create_file():
         #
         student_file = open("students.txt","r")
         for _ in range(1,20+1):
-            date = datetime.date.today()
+            date = dt.date.today()
             
-            rand_time = str(random_time())
+            # Start time
+            start_time = radar.random_time(start='2021-03-01T08:00:00', stop='2021-03-02T20:59:59')
+
+            # End Time
+            #rand_minute = random.randint(0, 60)
+            #end_time = start_time.hour , (start_time+timedelta(minutes = rand_minute))
 
             rfid_data = student_file.readline()
-            raw_data = [rfid_data,str(date),str(rand_time)]
+            raw_data = [rfid_data,str(date),str(start_time)] #,str(end_time)
             formated_data = [x[:-1] for x in raw_data]
             txt_file.write(str(formated_data)+'\n')
 
