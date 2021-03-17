@@ -8,6 +8,11 @@ import random
 import datetime as dt
 from datetime import timedelta
 
+import csv
+from tempfile import NamedTemporaryFile
+
+import re
+
 # Clear the screen.
 os.system('clear')
 
@@ -41,14 +46,13 @@ def create_file():
             date = dt.date.today()
             
             # Start time
-            start_time = radar.random_time(start='2021-03-01T08:00:00', stop='2021-03-02T20:59:59')
+            start_time = radar.random_time(start='2021-03-01T08:00:00', stop='2021-03-02T15:59:59')
 
             # End Time
-            #rand_minute = random.randint(0, 60)
-            #end_time = start_time.hour , (start_time+timedelta(minutes = rand_minute))
+            out_time = radar.random_time(start='2021-03-01T15:59:59', stop='2021-03-01T23:59:59')
 
             rfid_data = student_file.readline()
-            raw_data = [rfid_data,str(date),str(start_time)] #,str(end_time)
+            raw_data = [rfid_data,str(date),str(start_time),str(out_time)]
             formated_data = [x[:-1] for x in raw_data]
             txt_file.write(str(formated_data)+'\n')
 
@@ -66,10 +70,58 @@ def delete_file():
         os.remove('classroom3.txt')
         os.remove('classroom4.txt')
         os.remove('classroom5.txt')
+        os.remove('infected.txt')
         resp = "Data file deleted"
         print(resp)
     except:
         print("Files not found.")
+
+# CHECK FOR COVID EXPOSURES   
+def covid_Alert():
+    
+    infected_List = [] # create a list of infected 
+    
+    with open('classroom1.txt', 'r+') as csvfile:
+        temp_list = [] # Create temp copy of the csv file
+        
+        clientsReader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        
+        for row in clientsReader:
+            temp_list.append(row)
+            
+        now = dt.datetime.now()
+        infectedTime = now.replace(hour=8, minute=35, second=0, microsecond=0)
+        contagionTime = now.replace(hour=8, minute=45, second=0, microsecond=0)
+        
+        print(str(infectedTime) + " The infected time")
+        
+        for line in temp_list:
+ 
+                studentTime = line[2]
+                studentHourString, studentMinuteString = studentTime.split(':', 1)
+                studentHour = studentHourString.replace("0", "")
+                
+                studentHour = int(studentHourString[2:])
+ 
+                studentMinute = int(studentMinuteString[0:2])
+                
+                
+                today = now.replace(hour=int(studentHour), minute=studentMinute, second=0, microsecond=0)
+                
+                if infectedTime <= today <= contagionTime:
+                    print("--CORONA VIRUS DETECTED-- Student: " + line[0])
+                    infected =str(line[0])
+                    infected_List.append(infected)
+                    
+                else:
+                    print("--Student is safe-- Student: " + line[0])
+    with open('infected.txt', 'w', newline='') as csvfile:
+        
+        csv_writer = csv.writer(csvfile, delimiter=' ', quotechar='|')
+        for line in infected_List: # Attempting to write the updated infected to the txt file
+            csv_writer.writerow(line)
+ 
+        print('File Created!')
 
 # Input Loop, break if "x" is selected
 while True:
@@ -78,6 +130,7 @@ while True:
 
     print("[1] Generate data files for the day (5)")
     print("[2] Delete data files")
+    print("[3] Generate covid rapport")
     print("[x] Exit")
     choice = input('>> ')
     print()
@@ -87,6 +140,9 @@ while True:
 
     elif choice == "2":
         delete_file()
+
+    elif choice == "3":
+        covid_Alert()
 
     elif choice == "x":
         os.system('clear')
